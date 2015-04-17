@@ -137,11 +137,11 @@ void Draw_Ipoints(cv::Mat &img, const std::vector<Ipoint> &keypoints)
     {
         x = keypoints[i].x;
         y = keypoints[i].y;
-        s = keypoints[i].scale*2.0;
+        s = keypoints[i].scale*2.0f;
     
         // Draw a circle centered on the interest point
-        cv::circle(img,cv::Point(x,y),s,cv::Scalar(255,0,0),1);
-        cv::circle(img,cv::Point(x,y),1.0,cv::Scalar(0,255,0),-1);
+        cv::circle(img,cv::Point(x,y),fRound(s),cv::Scalar(255,0,0),1);
+        cv::circle(img,cv::Point(x,y),1,cv::Scalar(0,255,0),-1);
     }
 }
 

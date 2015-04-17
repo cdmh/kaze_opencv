@@ -44,15 +44,6 @@
 #define DEGREE_TO_RADIAN(x) ((x) * CV_PI / 180.0)
 #define RADIAN_TO_DEGREE(x) ((x) * 180.0 / CV_PI)
 
-template<typename T, typename U>
-T cast_or_throw(U value)
-{
-    T new_value = static_cast<U>(value);
-    if (static_cast<U>(new_value) != value)
-        throw std::bad_cast();
-    return new_value;
-}
-
 namespace cv
 {
     /***
@@ -66,11 +57,11 @@ namespace cv
         aux.y = fRound(aux.yf);
 
         //cout << "SURF size: " << kpts_surf1_[i].size*.5 << endl;
-        aux.octave = kp.octave;
+        aux.octave = cast_or_throw<float>(kp.octave);
 
         // Get the radius for visualization
-        aux.scale = kp.size*.2;    // Updated by Yuhua Zou
-        aux.angle = DEGREE_TO_RADIAN(kp.angle);
+        aux.scale = kp.size*.2f;    // Updated by Yuhua Zou
+        aux.angle = static_cast<float>(DEGREE_TO_RADIAN(kp.angle));
 
         //aux.descriptor_size = 64;
     }
@@ -80,11 +71,11 @@ namespace cv
         kp.pt.x = src.xf;
         kp.pt.y = src.yf;
 
-        kp.angle    = RADIAN_TO_DEGREE(src.angle);
+        kp.angle    = static_cast<float>(RADIAN_TO_DEGREE(src.angle));
         kp.response = src.dresponse;
 
-        kp.octave = src.octave;    
-        kp.size = src.scale*5.0;    // Updated by Yuhua Zou
+        kp.octave = fRound(src.octave);
+        kp.size = src.scale*5.f;    // Updated by Yuhua Zou
     }
 
     /***
@@ -188,11 +179,17 @@ namespace cv
             kazeEvolution.Feature_Description(kazePoints);
 
             cv::Mat& descriptors = _descriptors.getMatRef();
-            descriptors.create(kazePoints.size(), descriptorSize(), descriptorType());
+            descriptors.create(
+                cast_or_throw<int>(kazePoints.size()),
+                cast_or_throw<int>(descriptorSize()),
+                cast_or_throw<int>(descriptorType()));
 
-            for (size_t i = 0; i < kazePoints.size(); i++)
+            for (int i = 0; i < cast_or_throw<int>(kazePoints.size()); i++)
             {
-                std::copy(kazePoints[i].descriptor.begin(), kazePoints[i].descriptor.end(), (float*)descriptors.row(i).data);
+                std::copy(
+                    kazePoints[i].descriptor.begin(),
+                    kazePoints[i].descriptor.end(),
+                    (float*)descriptors.row(i).data);
             }
         }
 

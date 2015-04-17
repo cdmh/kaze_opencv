@@ -40,6 +40,15 @@ void Copy_and_Convert_Scale(const cv::Mat &src, cv::Mat &dst);
 void Draw_Ipoints(cv::Mat &img, const std::vector<Ipoint> &keypoints);
 int fRound(float flt);
 
+template<typename T, typename U>
+T cast_or_throw(U value)
+{
+    T new_value = static_cast<T>(value);
+    if (static_cast<U>(new_value) != value)
+        throw std::bad_cast();
+    return new_value;
+}
+
 //*************************************************************************************
 //*************************************************************************************
 

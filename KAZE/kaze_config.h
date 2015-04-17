@@ -31,7 +31,7 @@
 
 // Some defines
 #define NMAX_CHAR 400
-#define HAVE_BOOST_THREADING 0 // 1: you have installed and included Boost library, 0: otherwise
+#define HAVE_BOOST_THREADING 1 // 1: you have installed and included Boost library, 0: otherwise
 
 // Options structure
 struct toptions
@@ -75,32 +75,32 @@ typedef struct
 }tevolution;
 
 // Some default options
-const float DEFAULT_SCALE_OFFSET = 1.60;              // Base scale offset (sigma units)
-const float DEFAULT_OCTAVE_MAX = 4.0;                 // Maximum octave evolution of the image 2^sigma (coarsest scale sigma units)
-const int DEFAULT_NSUBLEVELS = 4;                     // Default number of sublevels per scale level
-const float DEFAULT_DETECTOR_THRESHOLD = 0.001;       // Detector response threshold to accept point
-const float DEFAULT_MIN_DETECTOR_THRESHOLD = 0.00001; // Minimum Detector response threshold to accept point
-const int DEFAULT_DESCRIPTOR_MODE = 1;                // Descriptor Mode 0->SURF, 1->M-SURF
-const bool DEFAULT_UPRIGHT = false;                  // Upright descriptors, not invariant to rotation
-const bool DEFAULT_EXTENDED = false;                 // Extended descriptor, dimension 128
-const bool DEFAULT_SAVE_SCALE_SPACE = false;         // For saving the scale space images
-const bool DEFAULT_VERBOSITY = false;                // Verbosity level (0->no verbosity)
-const bool DEFAULT_SHOW_RESULTS = true;              // For showing the output image with the detected features plus some ratios
-const bool DEFAULT_SAVE_KEYPOINTS = false;           // For saving the list of keypoints
+const float DEFAULT_SCALE_OFFSET = 1.60f;              // Base scale offset (sigma units)
+const int DEFAULT_OCTAVE_MAX = 4;                      // Maximum octave evolution of the image 2^sigma (coarsest scale sigma units)
+const int DEFAULT_NSUBLEVELS = 4;                      // Default number of sublevels per scale level
+const float DEFAULT_DETECTOR_THRESHOLD = 0.001f;       // Detector response threshold to accept point
+const float DEFAULT_MIN_DETECTOR_THRESHOLD = 0.00001f; // Minimum Detector response threshold to accept point
+const int DEFAULT_DESCRIPTOR_MODE = 1;                 // Descriptor Mode 0->SURF, 1->M-SURF
+const bool DEFAULT_UPRIGHT = false;                    // Upright descriptors, not invariant to rotation
+const bool DEFAULT_EXTENDED = false;                   // Extended descriptor, dimension 128
+const bool DEFAULT_SAVE_SCALE_SPACE = false;           // For saving the scale space images
+const bool DEFAULT_VERBOSITY = false;                  // Verbosity level (0->no verbosity)
+const bool DEFAULT_SHOW_RESULTS = true;                // For showing the output image with the detected features plus some ratios
+const bool DEFAULT_SAVE_KEYPOINTS = false;             // For saving the list of keypoints
 
 // Some important configuration variables
-const float DEFAULT_SIGMA_SMOOTHING_DERIVATIVES = 1.0;
-const float DEFAULT_KCONTRAST = .01;
-const float KCONTRAST_PERCENTILE = 0.7;
+const float DEFAULT_SIGMA_SMOOTHING_DERIVATIVES = 1.0f;
+const float DEFAULT_KCONTRAST = .01f;
+const float KCONTRAST_PERCENTILE = 0.7f;
 const int KCONTRAST_NBINS = 300;
 const bool COMPUTE_KCONTRAST = true;
 const bool SUBPIXEL_REFINEMENT = true;
 const int DEFAULT_DIFFUSIVITY_TYPE = 1;               // 0 -> PM G1, 1 -> PM G2, 2 -> Weickert
 const bool USE_CLIPPING_NORMALIZATION = false;
-const float CLIPPING_NORMALIZATION_RATIO = 1.6;
+const float CLIPPING_NORMALIZATION_RATIO = 1.6f;
 const int CLIPPING_NORMALIZATION_NITER = 5;
-const float PI = 3.14159;
-const float M2_PI = 6.2832;
+const float PI = 3.14159f;
+const float M2_PI = 6.2832f;
 
 //*************************************************************************************
 //*************************************************************************************

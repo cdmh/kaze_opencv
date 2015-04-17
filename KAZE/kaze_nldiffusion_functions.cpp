@@ -24,6 +24,7 @@
  * @update 2013-03-28 by Yuhua Zou
  */
 
+#include "kaze_utils.h"
 #include "kaze_nldiffusion_functions.h"
 
 // Namespaces
@@ -46,7 +47,7 @@ void Gaussian_2D_Convolution(const cv::Mat &src, cv::Mat &dst, unsigned int ksiz
     // Compute an appropriate kernel size according to the specified sigma
     if( sigma > ksize_x || sigma > ksize_y || ksize_x == 0 || ksize_y == 0 )
     {
-        ksize_x = ceil(2.0*(1.0 + (sigma-0.8)/(0.3)));
+        ksize_x = cast_or_throw<unsigned>(ceil(2.0*(1.0 + (sigma-0.8)/(0.3))));
         ksize_y = ksize_x;
     }
 
@@ -110,7 +111,7 @@ void Image_Derivatives_SD(const cv::Mat &src, cv::Mat &dst, unsigned int xorder,
                     right = aux.cols-1;
                 }
                 
-                *(dst.ptr<float>(i)+j) = 0.5*((*(aux.ptr<float>(i)+right))-(*(aux.ptr<float>(i)+left)));
+                *(dst.ptr<float>(i)+j) = 0.5f*((*(aux.ptr<float>(i)+right))-(*(aux.ptr<float>(i)+left)));
            }
        }
        
@@ -143,7 +144,7 @@ void Image_Derivatives_SD(const cv::Mat &src, cv::Mat &dst, unsigned int xorder,
                     down = aux.rows-1;
                 }
                 
-                *(dst.ptr<float>(j)+i) = 0.5*((*(aux.ptr<float>(down)+i))-(*(aux.ptr<float>(up)+i)));
+                *(dst.ptr<float>(j)+i) = 0.5f*((*(aux.ptr<float>(down)+i))-(*(aux.ptr<float>(up)+i)));
            }
        }
        
@@ -192,6 +193,7 @@ void Image_Derivatives_Scharr(const cv::Mat &src, cv::Mat &dst, unsigned int xor
  * @param ksize_y Kernel size in Y-direction (vertical) for the Gaussian smoothing kernel
  * @param sigma Standard deviation of the Gaussian kernel
  */
+#pragma warning(disable: 4127)
 void Compute_Gaussian_2D_Derivatives(const cv::Mat &src, cv::Mat &smooth,cv::Mat &Lx, cv::Mat &Ly,
                                      cv::Mat &Lxy, cv::Mat &Lxx, cv::Mat &Lyy,
                                      unsigned int ksize_x, unsigned int ksize_y, float sigma )
@@ -228,7 +230,7 @@ void Compute_Gaussian_2D_Derivatives(const cv::Mat &src, cv::Mat &smooth,cv::Mat
  * @param Ly First order image derivative in Y-direction (vertical)
  * @param k Contrast factor parameter
  */
-void PM_G1(const cv::Mat &src, cv::Mat &dst, cv::Mat &Lx, cv::Mat &Ly, float k )
+void PM_G1(const cv::Mat &/*src*/, cv::Mat &dst, cv::Mat &Lx, cv::Mat &Ly, float k )
 {
     //cv::exp(-(Lx.mul(Lx) + Ly.mul(Ly))/(k*k),dst);
     int N = Lx.rows * Lx.cols;
@@ -257,7 +259,7 @@ void PM_G1(const cv::Mat &src, cv::Mat &dst, cv::Mat &Lx, cv::Mat &Ly, float k )
  * @param Ly First order image derivative in Y-direction (vertical)
  * @param k Contrast factor parameter
  */
-void PM_G2(const cv::Mat &src, cv::Mat &dst, cv::Mat &Lx, cv::Mat &Ly, float k )
+void PM_G2(const cv::Mat &/*src*/, cv::Mat &dst, cv::Mat &Lx, cv::Mat &Ly, float k )
 {
     //dst = 1./(1. + (Lx.mul(Lx) + Ly.mul(Ly))/(k*k));
     int N = Lx.rows * Lx.cols;
@@ -269,7 +271,7 @@ void PM_G2(const cv::Mat &src, cv::Mat &dst, cv::Mat &Lx, cv::Mat &Ly, float k )
         ly = *(Ly.ptr<float>(0)+i);
         lx *= lx;
         ly *= ly;
-        *(dst.ptr<float>(0)+i) = 1.0 / (1.0 + (lx + ly)/k2);
+        *(dst.ptr<float>(0)+i) = 1.f / (1.f + (lx + ly)/k2);
     }
     
 }
@@ -288,7 +290,7 @@ void PM_G2(const cv::Mat &src, cv::Mat &dst, cv::Mat &Lx, cv::Mat &Ly, float k )
  * Applications of nonlinear diffusion in image processing and computer vision,
  * Proceedings of Algorithmy 2000
  */
-void Weickert_Diffusivity(const cv::Mat &src, cv::Mat &dst, cv::Mat &Lx, cv::Mat &Ly, float k )
+void Weickert_Diffusivity(const cv::Mat &/*src*/, cv::Mat &dst, cv::Mat &Lx, cv::Mat &Ly, float k )
 {
     //cv::Mat modg;
     //cv::pow((Lx.mul(Lx) + Ly.mul(Ly))/(k*k),4,modg);
@@ -306,7 +308,7 @@ void Weickert_Diffusivity(const cv::Mat &src, cv::Mat &dst, cv::Mat &Lx, cv::Mat
         lx2 *= lx2;
         ly2 *= ly2;
         modg = std::pow( (lx2 + ly2)/k2, 4 );
-        *(dst.ptr<float>(0)+i) = 1.0 - std::exp( -3.315/modg );
+        *(dst.ptr<float>(0)+i) = 1.f - std::exp( -3.315f/modg );
     }
 
 }
@@ -330,9 +332,8 @@ void Weickert_Diffusivity(const cv::Mat &src, cv::Mat &dst, cv::Mat &Lx, cv::Mat
 float Compute_K_Percentile(const cv::Mat &img, float perc, float gscale, unsigned int nbins, unsigned int ksize_x, unsigned int ksize_y)
 {
     float kperc = 0.0, modg = 0.0, lx = 0.0, ly = 0.0;
-    unsigned int nbin = 0, nelements = 0, nthreshold = 0, k = 0;
+    unsigned int nbin = 0, k = 0;
     float hmax = 0.0;        // maximum gradient
-    int npoints = 0.0;    // number of points of which gradient greater than zero
 
     // Create the array for the histogram
     std::vector<float> hist(nbins,0);
@@ -370,20 +371,20 @@ float Compute_K_Percentile(const cv::Mat &img, float perc, float gscale, unsigne
     hmax = *std::max_element(Mo.begin(), Mo.end());
 
     // Compute the histogram
-    float hmax1 = 1.00001*hmax;
-    npoints = Mo.size();
+    float hmax1 = 1.00001f*hmax;
 
+    int npoints = cast_or_throw<int>(Mo.size());    // number of points of which gradient greater than zero
     for (int i = 0; i < npoints; i++)
     {
-        nbin = floor(nbins*(Mo[i]/hmax1));
-
+        nbin = cast_or_throw<unsigned>(floor(nbins*(Mo[i]/hmax1)));
         hist[nbin]++;
     }
         
     // Now find the perc of the histogram percentile
-    nthreshold = (unsigned int)(npoints*perc);
+    auto nthreshold = cast_or_throw<unsigned>(npoints*perc);
     
     // find the bin (k) in which accumulated points are greater than 70% (perc) of total valid points (npoints)
+    float nelements = 0.f;
     for( k = 0; nelements < nthreshold && k < nbins; k++)
     {
         nelements = nelements + hist[k];
@@ -391,7 +392,7 @@ float Compute_K_Percentile(const cv::Mat &img, float perc, float gscale, unsigne
     
     if( nelements < nthreshold )
     {
-        kperc = 0.03;
+        kperc = 0.03f;
     }
     else
     {
@@ -422,8 +423,8 @@ void Compute_Scharr_Derivatives(const cv::Mat &src, cv::Mat &dst, int xorder, in
     float sum_pos = 0.0, sum_neg = 0.0, w = 0.0, norm = 0.0;
 
     // Values for the Scharr kernel
-    w = 10.0/3.0;
-    norm = 1.0/(2.0*scale*(w+2.0));
+    w = 10.0f/3.0f;
+    norm = 1.0f/(2.f*scale*(w+2.f));
 
     // Build reflect-border index map
     int rows = src.rows, cols = src.cols;
@@ -538,7 +539,7 @@ void NLD_Step_Scalar(cv::Mat &Ld2, const cv::Mat &Ld1, const cv::Mat &c, float s
             ypos = ((*(c.ptr<float>(i)+j))+(*(c.ptr<float>(ipos)+j)))*((*(Ld1.ptr<float>(ipos)+j))-(*(Ld1.ptr<float>(i)+j)));
             yneg = ((*(c.ptr<float>(ineg)+j))+(*(c.ptr<float>(i)+j)))*((*(Ld1.ptr<float>(i)+j))-(*(Ld1.ptr<float>(ineg)+j)));
 
-            *(Ld2.ptr<float>(i)+j) =  *(Ld1.ptr<float>(i)+j) + 0.5*stepsize*(xpos-xneg+ypos-yneg);
+            *(Ld2.ptr<float>(i)+j) =  *(Ld1.ptr<float>(i)+j) + 0.5f*stepsize*(xpos-xneg+ypos-yneg);
         }
     }
 }

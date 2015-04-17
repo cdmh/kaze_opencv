@@ -86,9 +86,9 @@ toptions::toptions(std::string name, float val)
     } else if (name == "sderivatives") {
         sderivatives = val;
     } else if (name == "upright") {
-        upright = static_cast<bool>(val);
+        upright = !(val);
     } else if (name == "extended") {
-        extended = static_cast<bool>(val);
+        extended = !(val);
     } else if (name == "nfeatures") {
         nfeatures = static_cast<int>(val);
     } 

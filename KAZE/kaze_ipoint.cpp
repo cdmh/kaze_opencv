@@ -98,7 +98,7 @@ void filterUnvalidKeypoints( std::vector<Ipoint>& keypoints )
 void filterDuplicated( std::vector<Ipoint>& keypoints )
 {
     int i, j, n = (int)keypoints.size();
-    int esigma = 0, level = 0;
+    int esigma = 0;
     float dist = 0.0;
 
     for (i = 0; i < n; i++)
@@ -106,7 +106,7 @@ void filterDuplicated( std::vector<Ipoint>& keypoints )
         if (keypoints[i].dresponse == 0)
             continue;
 
-        level = keypoints[i].level;
+        auto level = keypoints[i].level;
         esigma = keypoints[i].sigma_size;
         esigma *= esigma;
 
