@@ -44,6 +44,15 @@
 #define DEGREE_TO_RADIAN(x) ((x) * CV_PI / 180.0)
 #define RADIAN_TO_DEGREE(x) ((x) * 180.0 / CV_PI)
 
+template<typename T, typename U>
+T cast_or_throw(U value)
+{
+    T new_value = static_cast<U>(value);
+    if (static_cast<U>(new_value) != value)
+        throw std::bad_cast();
+    return new_value;
+}
+
 namespace cv
 {
     /***
@@ -167,7 +176,7 @@ namespace cv
             kazePoints.resize(_keypoints.size());
 
             #pragma omp parallel for
-            for (size_t i = 0; i < kazePoints.size(); i++)
+            for (int i = 0; i < cast_or_throw<int>(kazePoints.size()); i++)
             {
                 convertPoint(_keypoints[i], kazePoints[i]);    
             }
@@ -193,7 +202,7 @@ namespace cv
             _keypoints.resize(kazePoints.size());
 
             #pragma omp parallel for
-            for (size_t i = 0; i < kazePoints.size(); i++)
+            for (int i = 0; i < cast_or_throw<int>(kazePoints.size()); i++)
             {
                 convertPoint(kazePoints[i], _keypoints[i]);
             }
