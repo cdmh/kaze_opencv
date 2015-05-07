@@ -363,7 +363,7 @@ float Compute_K_Percentile(const cv::Mat &img, float perc, float gscale, unsigne
         if (!lx && !ly)
             continue;
 
-        modg = sqrt(lx*lx + ly*ly);
+        modg = hypot(lx, ly);
 
         Mo.push_back(modg);
     }
