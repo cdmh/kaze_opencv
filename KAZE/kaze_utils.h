@@ -40,14 +40,46 @@ void Copy_and_Convert_Scale(const cv::Mat &src, cv::Mat &dst);
 void Draw_Ipoints(cv::Mat &img, const std::vector<Ipoint> &keypoints);
 int fRound(float flt);
 
+namespace detail {
+
+template<typename T, typename U, bool>
+struct cast_or_thrower;
+
+template<typename T, typename U>
+struct cast_or_thrower<T, U, true>
+{
+    T operator()(U value) const
+    {
+        T const new_value = static_cast<T>(value);
+        U const cast_back = static_cast<U>(new_value);
+        if (cast_back != value)
+            throw std::bad_cast();
+        return new_value;
+    }
+};
+
+template<typename T, typename U>
+struct cast_or_thrower<T, U, false>
+{
+    T operator()(U value) const
+    {
+        T const new_value = static_cast<T>(value);
+        U const cast_back = static_cast<U>(new_value);
+        if (cast_back != floor(value))
+            throw std::bad_cast();
+        return new_value;
+    }
+};
+
+}   // namespace detail
+
 template<typename T, typename U>
 T cast_or_throw(U value)
 {
-    T new_value = static_cast<T>(value);
-    if (static_cast<U>(new_value) != value)
-        throw std::bad_cast();
-    return new_value;
+    return detail::cast_or_thrower<
+        T, U, !(std::is_integral<T>::value  &&  !std::is_integral<U>::value)>()(value);
 }
+
 
 //*************************************************************************************
 //*************************************************************************************
